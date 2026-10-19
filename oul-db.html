@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OUL-DB, a database for a lunar observatory – Valeria Garduño</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="index.html">&larr; Back to the front page</a>
+<header class="casehead">
+<div class="kicker">Case file &bull; Exhibit C &bull; Confirmed</div>
+<h1>OUL-DB, a database for a lunar observatory</h1>
+<p class="lede">A hybrid Big Data database platform for an Ultraviolet Lunar Observatory.</p>
+</header>
+<dl class="facts"><div><dt>Role</dt><dd>Researcher</dd></div><div><dt>Type</dt><dd>Research project</dd></div><div><dt>Tools</dt><dd>MongoDB, PostgreSQL, pgSphere</dd></div><div><dt>Standards</dt><dd>IVOA: TAP, ADQL, ObsCore</dd></div></dl>
+
+<section>
+<div class="head"><p>The Story</p><h2>What happened</h2></div>
+<div class="story"><p>The platform uses a polyglot architecture: several database technologies working together, each one for the kind of data it handles best. It combines MongoDB and PostgreSQL with pgSphere and follows IVOA standards, together with FAIR principles for the data.</p><p>I worked on verifying the design of the hybrid architecture. I also prepared the presentation script and slides covering the objectives, the methodology and the conclusions of the project.</p></div>
+</section>
+
+<section>
+<div class="head"><p>The Evidence</p><h2>Photos and video</h2></div>
+<!--
+  CÓMO AGREGAR TUS ARCHIVOS:
+  1. Crea la carpeta assets/oul-db/ junto a este archivo.
+  2. Copia ahí tus fotos y videos con los nombres de abajo (o cambia el nombre en el src).
+  3. Para agregar otra foto, copia un bloque <figure> completo y cambia el src y el texto.
+  Mientras el archivo no exista, se muestra un recuadro con instrucciones.
+-->
+<div class="gallery">
+<figure class="slot" data-hint="Agrega tu foto en assets/oul-db/photo-1.jpg">
+<img src="assets/oul-db/photo-1.jpg" alt="Photo 1 of the project">
+<figcaption>Describe this photo here.</figcaption>
+</figure>
+<figure class="slot" data-hint="Agrega tu foto en assets/oul-db/photo-2.jpg">
+<img src="assets/oul-db/photo-2.jpg" alt="Photo 2 of the project">
+<figcaption>Describe this photo here.</figcaption>
+</figure>
+<figure class="slot wide" data-hint="Agrega tu video en assets/oul-db/demo.mp4">
+<video controls preload="metadata"><source src="assets/oul-db/demo.mp4" type="video/mp4"></video>
+<figcaption>Describe this video here.</figcaption>
+</figure>
+<!-- Para un video de YouTube, usa esto en lugar del bloque de arriba:
+<iframe width="100%" height="420" src="https://www.youtube.com/embed/TU_ID_DE_VIDEO" title="Demo" allowfullscreen></iframe>
+-->
+</div>
+</section>
+
+<section>
+<div class="head"><p>Exhibit Code</p><h2>Code</h2></div>
+<!-- Pega tu código dentro de <code>. Si pegas código con símbolos < o >, escribe &lt; y &gt; en su lugar. -->
+<p class="codelabel">main.c (change this name)</p>
+<pre><code>// Paste your code here.</code></pre>
+</section>
+
+<footer>&copy; 2026 The Valeria Garduño Times. Printed in Morelia.</footer>
+</div>
+<script>
+document.querySelectorAll('figure.slot').forEach(function(f){
+  var m=f.querySelector('img,source');
+  if(m)m.addEventListener('error',function(){f.classList.add('missing')});
+  var i=f.querySelector('img');
+  if(i&&i.complete&&i.naturalWidth===0)f.classList.add('missing');
+  var v=f.querySelector('video');
+  if(v&&v.networkState===3)f.classList.add('missing');
+});
+</script>
+</body>
+</html>

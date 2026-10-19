@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tomato ripeness gripper – Valeria Garduño</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="index.html">&larr; Back to the front page</a>
+<header class="casehead">
+<div class="kicker">Case file &bull; Exhibit B &bull; Confirmed</div>
+<h1>Tomato ripeness gripper</h1>
+<p class="lede">A gripper that measures the electrical impedance of a tomato to judge how ripe it is.</p>
+</header>
+<dl class="facts"><div><dt>Role</dt><dd>Individual project</dd></div><div><dt>Context</dt><dd>Social service</dd></div><div><dt>Tools</dt><dd>C, STM32, I2C, AD5933</dd></div><div><dt>Status</dt><dd>Prototype on breadboard</dd></div></dl>
+
+<section>
+  <div class="head">
+    <p>The Story</p>
+    <h2>Development of an Instrumented Robotic Gripper for Agricultural Assessment</h2>
+  </div>
+
+  <div class="story">
+    <h3>1. Project Function</h3>
+    <p>I designed and built an instrumented mechatronic robotic gripper for non-destructive tomato ripeness evaluation. The main objective of this device is to hold the fruit with controlled pressure using force sensors to prevent damage, while performing bioelectrical impedance measurements through an electrode array to analyze the internal physical properties and ripeness state of the tissue in real time.</p>
+
+    <h3>2. Development Steps</h3>
+    <ol>
+      <li>
+        <strong>Mechanical and Kinematic Design (SolidWorks):</strong>
+        <ul>
+          <li>I designed the entire gripper geometry and mechanism in SolidWorks, defining assembly mates, degrees of freedom, and dimensional tolerances to achieve smooth, precise, and ergonomic grasping.</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Rapid Prototyping and Additive Manufacturing (3D Printing):</strong>
+        <ul>
+          <li>I manufactured the structural components and mounting interfaces using 3D printing (FDM). I performed physical assembly tests and design iterations to ensure mechanical rigidity and proper fit for actuators and sensors.</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Custom Electronics and PCB Layout Design:</strong>
+        <ul>
+          <li>I designed the schematic diagram and custom printed circuit board (PCB) layout. I incorporated ground planes and optimized trace routing to minimize signal noise on low-amplitude analog measurements.</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Sensor Integration and Instrumentation:</strong>
+        <ul>
+          <li>I installed force sensors on the gripper's contact surfaces to monitor gripping pressure.</li>
+          <li>I integrated an electrode array into the fingertips of the gripper to perform bioelectrical impedance spectroscopy directly on the surface of the fruit.</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Embedded Systems and C++ Firmware Development:</strong>
+        <ul>
+          <li>I programmed an ESP32 microcontroller in C++ to manage real-time multi-channel data acquisition, coordinating the simultaneous reading of applied force and bioelectrical impedance response.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>3. Conclusion</h3>
+    <p>This project allowed me to execute a complete end-to-end mechatronic development lifecycle, combining mechanical CAD design, additive manufacturing, custom electronics design, multi-physics sensing, and embedded systems. I successfully created a functional prototype capable of automating delicate handling and agricultural quality characterization, demonstrating the practical application of mechatronics engineering in real-world automation and instrumentation challenges.</p>
+  </div>
+</section>
+
+<section>
+<div class="head"><p>The Evidence</p><h2>Photos and video</h2></div>
+<!--
+  CÓMO AGREGAR TUS ARCHIVOS:
+  1. Crea la carpeta assets/garra/ junto a este archivo.
+  2. Copia ahí tus fotos y videos con los nombres de abajo (o cambia el nombre en el src).
+  3. Para agregar otra foto, copia un bloque <figure> completo y cambia el src y el texto.
+  Mientras el archivo no exista, se muestra un recuadro con instrucciones.
+-->
+<div class="gallery">
+<figure class="slot" data-hint="Agrega tu foto en assets/garra/photo-1.jpg">
+<img src="pcb_garar.png" alt="Photo 1 of the project">
+<figcaption>Describe this photo here.</figcaption>
+</figure>
+<figure class="slot" data-hint="Agrega tu foto en assets/garra/photo-2.jpg">
+<img src="cad.png" alt="Photo 2 of the project">
+<figcaption>Describe this photo here.</figcaption>
+</figure>
+
+</figure>
+<!-- Para un video de YouTube, usa esto en lugar del bloque de arriba:
+<iframe width="100%" height="420" src="https://www.youtube.com/embed/TU_ID_DE_VIDEO" title="Demo" allowfullscreen></iframe>
+-->
+</div>
+</section>
+
+<section>
+<div class="head"><p>Exhibit Code</p><h2>Code</h2></div>
+<!-- Pega tu código dentro de <code>. Si pegas código con símbolos < o >, escribe &lt; y &gt; en su lugar. -->
+<p class="codelabel">main.c</p>
+<pre><code>#include <Wire.h>
+#include "AD5933.h"
+#include <math.h>
+
+// --- PINES Y CONFIGURACIÓN DEL MOTOR Y SENSORES ---
+const int SF1   = 2;
+const int SF2   = 4;
+
+const int PWMA  = 25;
+const int AIN1  = 27;
+const int AIN2  = 26;
+
+const int BTN1  = 14;
+const int BTN2  = 12;
+
+const int freq_pwm = 20000;
+const int resolucion_pwm = 8;
+int newton = 0;
+
+// --- PINES Y CONFIGURACIÓN DEL AD5933 ---
+#define SDA_PIN 21
+#define SCL_PIN 22
+
+const unsigned long START_FREQ = 10000;
+const unsigned long FREQ_INC   = 450;
+const unsigned int  NUM_INCS   = 200;
+
+static double filt_real = 0;
+static double filt_imag = 0;
+
+double gain[NUM_INCS + 1];
+double phase[NUM_INCS + 1];
+
+const long R_CALIBRACION = 1000; 
+
+// Prototipos de funciones
+void mover(bool abrir, bool habilitar, int velocidad);
+void realizarBarrido();
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  // Inicialización de pines para Motor y Sensores
+  pinMode(SF1, INPUT);
+  pinMode(BTN1, INPUT_PULLDOWN);
+  pinMode(BTN2, INPUT_PULLDOWN);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  ledcAttach(PWMA, freq_pwm, resolucion_pwm);
+
+  // Inicialización bus I2C para AD5933
+  Serial.println("Iniciando bus I2C...");
+  Wire.begin(SDA_PIN, SCL_PIN);
+  delay(100);
+
+  Serial.println("\nEnviando Reset al AD5933...");
+  if (!AD5933::reset()) {
+    Serial.println("   [ERROR]: No hubo respuesta I2C del AD5933.");
+    while (true) { delay(500); }
+  }
+  Serial.println("Éxito.");
+
+  AD5933::setInternalClock(true); 
+  AD5933::setStartFrequency(START_FREQ);
+  AD5933::setIncrementFrequency(FREQ_INC);
+  AD5933::setNumberIncrements(NUM_INCS);
+  AD5933::setPGAGain(PGA_GAIN_X1);
+  AD5933::setPowerMode(POWER_STANDBY);
+
+  // Etapa de Calibración
+  Serial.print("Conecta tu resistencia de ");
+  Serial.print(R_CALIBRACION);
+  Serial.println(" Ohms. Envía cualquier letra por el Monitor Serie para calibrar...");
+  
+  while (Serial.available() == 0) {
+    delay(10);
+  }
+  while (Serial.available() > 0) {
+    Serial.read(); // Limpiar búfer
+  }
+
+  Serial.println("Calibrando sistema, por favor espera...");
+  if (!AD5933::calibrate(gain, phase, R_CALIBRACION, NUM_INCS + 1)) {
+    Serial.println("Error en la calibración. Deteniendo el sistema.");
+    while(true) { delay(500); } 
+  }
+  
+  Serial.println("¡Calibración exitosa!");
+  Serial.println("==================================================================================");
+  Serial.println("SISTEMA LISTO:");
+  Serial.println(" - Usa BTN1 y BTN2 para controlar la garra.");
+  Serial.println(" - Envía cualquier letra por el Monitor Serie para realizar una medición.");
+  Serial.println("==================================================================================");
+}
+
+void loop() {
+  // 1. Lectura del Sensor de Fuerza
+  int volts = analogReadMilliVolts(SF1); 
+  newton = ((volts - 2811.6) / -1.0108) * 9.81; 
+
+  // 2. Control Manual de la Garra (Motor)
+  bool abre   = digitalRead(BTN1);
+  bool cierra = digitalRead(BTN2);
+
+  if (abre && !cierra) {
+    mover(true, true, 255); 
+  }
+  else if (cierra && !abre) {
+    if (newton > 2054) { 
+      mover(false, false, 0); // Detiene el motor si sobrepasa el límite de fuerza
+    } else {
+      mover(false, true, 255); 
+    } 
+  }
+  else {
+    mover(false, false, 0); 
+  }
+
+  // 3. Activación de medición a petición mediante el Serial
+  if (Serial.available() > 0) {
+    // Limpia el búfer serial recibido
+    while (Serial.available() > 0) {
+      Serial.read();
+    }
+
+    // Detiene el motor antes de iniciar la medición para evitar ruido inductivo
+    mover(false, false, 0);
+    
+    Serial.println("\n--- INICIANDO BARRIDO DE IMPEDANCIA ---");
+    realizarBarrido();
+  }
+
+  delay(20); // Retardo pequeño para mantener fluida la respuesta de los botones
+}
+
+void mover(bool abrir, bool habilitar, int velocidad) {
+  if (!habilitar) {
+    ledcWrite(PWMA, 0);
+    digitalWrite(AIN1, LOW);
+    digitalWrite(AIN2, LOW);
+    return;
+  }
+
+  if (abrir) {
+    digitalWrite(AIN1, LOW);
+    digitalWrite(AIN2, HIGH);
+  } else {
+    digitalWrite(AIN1, HIGH);
+    digitalWrite(AIN2, LOW);
+  }
+
+  ledcWrite(PWMA, velocidad); 
+}
+
+void realizarBarrido() {
+  AD5933::setPowerMode(POWER_STANDBY);
+  AD5933::setControlMode(CTRL_INIT_START_FREQ);
+  delay(10); 
+  AD5933::setControlMode(CTRL_START_FREQ_SWEEP);
+  
+  Serial.println("Frecuencia(Hz),Real(Ohms),Imaginario(Ohms)");
+
+  int real, imag;
+  for (unsigned int i = 0; i <= NUM_INCS; i++) {
+    
+    unsigned long timeout = millis();
+    while ((AD5933::readStatusRegister() & STATUS_DATA_VALID) != STATUS_DATA_VALID) {
+      if (millis() - timeout > 1000) {
+        Serial.println("\n[ERROR]: Tiempo de espera agotado en la medición I2C.");
+        return;
+      }
+      yield();
+    }
+
+    AD5933::getComplexData(&real, &imag);
+    
+    double magnitud = sqrt(pow(real, 2) + pow(imag, 2));
+    double impedancia_ohms = 0;
+    double real2 = 0;
+    double imag2 = 0;
+    
+    if (magnitud > 0 && gain[i] > 0) {
+      impedancia_ohms = 1.0 / (magnitud * gain[i]);
+      double fase_bruta = atan2(imag, real);
+      double fase_corregida = fase_bruta - (phase[i] * (PI / 180.0));
+
+      double inst_real = impedancia_ohms * cos(fase_corregida);
+      double inst_imag = impedancia_ohms * sin(fase_corregida);
+
+      // --- AJUSTE Y CORRECCIÓN DE ERROR ---
+      double norm_i = (double)i / (double)NUM_INCS;
+
+      double comp_imag = -2.8278 * pow(norm_i, 2) + 10.4276 * norm_i + 4.6703;
+      double comp_real = -5.4621 * pow(norm_i, 2) + 5.4721 * norm_i - 2.1342;
+
+      inst_imag += comp_imag;
+      inst_real += comp_real;
+
+      if (i == 0) {
+        filt_real = inst_real;
+        filt_imag = inst_imag;
+      } else {
+        double alpha = 0.35; 
+        filt_real = alpha * inst_real + (1.0 - alpha) * filt_real;
+        filt_imag = alpha * inst_imag + (1.0 - alpha) * filt_imag;
+      }
+
+      real2 = filt_real;
+      imag2 = filt_imag;
+    }
+
+    long currentFreq = START_FREQ + (i * FREQ_INC);
+
+    Serial.print(currentFreq);
+    Serial.print(",");
+    Serial.print(real2);
+    Serial.print(",");
+    Serial.println(imag2);
+
+    if (i < NUM_INCS) {
+      AD5933::setControlMode(CTRL_INCREMENT_FREQ);
+    }
+  }
+  
+  AD5933::setPowerMode(POWER_STANDBY);
+  Serial.println("--- Fin del Barrido ---");
+}</code></pre>
+</section>
+
+<footer>&copy; 2026 The Valeria Garduño Times. Printed in Morelia.</footer>
+</div>
+<script>
+document.querySelectorAll('figure.slot').forEach(function(f){
+  var m=f.querySelector('img,source');
+  if(m)m.addEventListener('error',function(){f.classList.add('missing')});
+  var i=f.querySelector('img');
+  if(i&&i.complete&&i.naturalWidth===0)f.classList.add('missing');
+  var v=f.querySelector('video');
+  if(v&&v.networkState===3)f.classList.add('missing');
+});
+</script>
+</body>
+</html>

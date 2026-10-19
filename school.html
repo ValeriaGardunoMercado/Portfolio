@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ALBA, a portable breast cancer screening device – Valeria Garduño</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="index.html">&larr; Back to the front page</a>
+<header class="casehead">
+<div class="kicker">Case file &bull; Exhibit A &bull; Confirmed</div>
+<h1>Industrial Robotics & Control Systems Engineering</h1>
+<p class="lede">Proficient in programming, simulation, and deployment of industrial robotic manipulators (SCARA and 6-axis Epson robots) using SPEL+ within the Epson RC+ software environment, backed by a strong foundation in control theory and kinematics.</p>
+
+</header>
+
+
+
+<section>
+<div class="head"><p>The Evidence</p><h2>Photos and video</h2></div>
+
+<div class="gallery">
+
+<figure class="slot wide" data-hint="Agrega tu video en assets/alba/VideoAlba.mp4">
+<video controls preload="metadata"><source src="Robotics.mp4" type="video/mp4"></video>
+<figcaption>Describe this video here.</figcaption>
+</figure>
+<!-- Para un video de YouTube, usa esto en lugar del bloque de arriba:
+<iframe width="100%" height="420" src="https://www.youtube.com/embed/TU_ID_DE_VIDEO" title="Demo" allowfullscreen></iframe>
+-->
+</div>
+</section>
+
+<section>
+<div class="head"><p>Exhibit Code</p><h2>Code</h2></div>
+<!-- Pega tu código dentro de <code>. Si pegas código con símbolos < o >, escribe &lt; y &gt; en su lugar. -->
+<p class="codelabel">main.c (change this name)</p>
+<pre><code>Global Integer num_base
+Global String lado_fus$
+Global Integer torre_fus
+Global String ranura$
+
+
+' Programa principal
+Function main
+    Reset
+    Motor On
+    Power Low
+    Home
+    
+    String caja_lado$
+    Integer i
+    String repetir$
+    
+    Do
+        ' Pregunta lado de Caja
+        Print "Cual caja quieres? (D / I)"
+        Input caja_lado$
+        
+        If caja_lado$ = "D" Then
+            Call toma_caja_derecha
+        ElseIf caja_lado$ = "I" Then
+            Call toma_caja_izquierda
+        EndIf
+        
+        ' Pregunta numero de Base
+        Print "En cual base? (1, 2, 3, 4, 5, 6)"
+        Input num_base
+        Call colocar_caja
+        
+        'Preguntas de Fusibles (2 veces)
+        For i = 1 To 2
+            Print "--- Fusible ", i, " ---"
+            Print "De que lado tomo el fusible? (D o I)"
+            Input lado_fus$
+            
+            Print "De que torre tomo el fusible? (1, 2, 3)"
+            Input torre_fus
+            
+            Call toma_fusible
+            
+            If i = 1 Then
+                ranura$ = "I"
+            Else
+                ranura$ = "D"
+            EndIf
+            
+            Call colocar_fusible
+        Next i
+        
+        Home
+        Print "Ciclo de ensamble completado."
+        
+        ' --- 4. Pregunta para repetir ---
+        Print "Deseas realizar el proceso de nuevo? (si / no)"
+        Input repetir$
+        
+    Loop While repetir$ = "si" Or repetir$ = "s" Or repetir$ = "SI"
+    
+    Print "Programa finalizado correctamente."
+Fend
+
+' FUNCIONES DE CAJA
+Function toma_caja_derecha
+    On 2
+    Pass Caja_Der_4
+    Pass Caja_Der_3
+    Pass Caja_Der_2
+    Go Caja_Der_1
+    Off 2
+    Wait 0.2
+    Pass Caja_Der_2
+    Pass Caja_Der_3
+    Pass Caja_Der_4
+Fend
+
+Function toma_caja_izquierda
+    On 2
+    Pass Caja_Izq_4
+    Pass Caja_Izq_3
+    Pass Caja_Izq_2
+    Go Caja_Izq_1
+    Off 2
+    Wait 0.2
+    Pass Caja_Izq_2
+    Pass Caja_Izq_3
+    Pass Caja_Izq_4
+Fend
+
+Function colocar_caja
+    Select num_base
+        Case 1
+            Pass Base1_4
+            Pass Base1_3
+            Pass Base1_2
+            Go Base1_1
+            On 2
+            Wait 0.2
+            Pass Base1_2
+            Pass Base1_3
+            Pass Base1_4
+        Case 2
+            Pass Base2_4
+            Pass Base2_3
+            Pass Base2_2
+            Go Base2_1
+            On 2
+            Wait 0.2
+            Pass Base2_2
+            Pass Base2_3
+            Pass Base2_4
+        Case 3
+            Pass Base3_4
+            Pass Base3_3
+            Pass Base3_2
+            Go Base3_1
+            On 2
+            Wait 0.2
+            Pass Base3_2
+            Pass Base3_3
+            Pass Base3_4
+        Case 4
+            Pass Base4_4
+            Pass Base4_3
+            Pass Base4_2
+            Go Base4_1
+            On 2
+            Wait 0.2
+            Pass Base4_2
+            Pass Base4_3
+            Pass Base4_4
+        Case 5
+            Pass Base5_4
+            Pass Base5_3
+            Pass Base5_2
+            Go Base5_1
+            On 2
+            Wait 0.2
+            Pass Base5_2
+            Pass Base5_3
+            Pass Base5_4
+        Case 6
+            Pass Base6_4
+            Pass Base6_3
+            Pass Base6_2
+            Go Base6_1
+            On 2
+            Wait 0.2
+            Pass Base6_2
+            Pass Base6_3
+            Pass Base6_4
+    Send
+Fend
+' FUNCIONES DE FUSIBLES
+
+Function toma_fusible
+    On 2
+    If lado_fus$ = "I" Then
+        Select torre_fus
+            Case 1
+                Pass Fusible1_izq_4
+                Pass Fusible1_izq_3
+                Pass Fusible1_izq_2
+                Go Fusible1_izq_1
+                Off 2
+                Wait 0.2
+                Pass Fusible1_izq_2
+                Pass Fusible1_izq_3
+                Pass Fusible1_izq_4
+            Case 2
+                Pass Fusible2_izq_4
+                Pass Fusible2_izq_3
+                Pass Fusible2_izq_2
+                Go Fusible2_izq_1
+                Off 2
+                Wait 0.2
+                Pass Fusible2_izq_2
+                Pass Fusible2_izq_3
+                Pass Fusible2_izq_4
+            Case 3
+                Pass Fusible3_izq_4
+                Pass Fusible3_izq_3
+                Pass Fusible3_izq_2
+                Go Fusible3_izq_1
+                Off 2
+                Wait 0.2
+                Pass Fusible3_izq_2
+                Pass Fusible3_izq_3
+                Pass Fusible3_izq_4
+        Send
+    ElseIf lado_fus$ = "D" Then
+        Select torre_fus
+            Case 1
+                Pass Fusible1_Der_4
+                Pass Fusible1_Der_3
+                Pass Fusible1_Der_2
+                Go Fusible1_Der_1
+                Off 2
+                Wait 0.2
+                Pass Fusible1_Der_2
+                Pass Fusible1_Der_3
+                Pass Fusible1_Der_4
+            Case 2
+                Pass Fusible2_Der_4
+                Pass Fusible2_Der_3
+                Pass Fusible2_Der_2
+                Go Fusible2_Der_1
+                Off 2
+                Wait 0.2
+                Pass Fusible2_Der_2
+                Pass Fusible2_Der_3
+                Pass Fusible2_Der_4
+            Case 3
+                Pass Fusible3_Der_4
+                Pass Fusible3_Der_3
+                Pass Fusible3_Der_2
+                Go Fusible3_Der_1
+                Off 2
+                Wait 0.2
+                Pass Fusible3_Der_2
+                Pass Fusible3_Der_3
+                Pass Fusible3_Der_4
+        Send
+    EndIf
+Fend
+
+Function colocar_fusible
+    If ranura$ = "I" Then
+        Select num_base
+            Case 1
+                Pass Base1_Fus_Izq_4
+                Pass Base1_Fus_Izq_3
+                Pass Base1_Fus_Izq_2
+                Go Base1_Fus_Izq_1
+                On 2
+                Wait 0.2
+                Pass Base1_Fus_Izq_2
+                Pass Base1_Fus_Izq_3
+                Pass Base1_Fus_Izq_4
+            Case 2
+                Pass Base2_Fus_Izq_4
+                Pass Base2_Fus_Izq_3
+                Pass Base2_Fus_Izq_2
+                Go Base2_Fus_Izq_1
+                On 2
+                Wait 0.2
+                Pass Base2_Fus_Izq_2
+                Pass Base2_Fus_Izq_3
+                Pass Base2_Fus_Izq_4
+            Case 3
+                Pass Base3_Fus_Izq_4
+                Pass Base3_Fus_Izq_3
+                Pass Base3_Fus_Izq_2
+                Go Base3_Fus_Izq_1
+                On 2
+                Wait 0.2
+                Pass Base3_Fus_Izq_2
+                Pass Base3_Fus_Izq_3
+                Pass Base3_Fus_Izq_4
+            Case 4
+                Pass Base4_Fus_Izq_4
+                Pass Base4_Fus_Izq_3
+                Pass Base4_Fus_Izq_2
+                Go Base4_Fus_Izq_1
+                On 2
+                Wait 0.2
+                Pass Base4_Fus_Izq_2
+                Pass Base4_Fus_Izq_3
+                Pass Base4_Fus_Izq_4
+            Case 5
+                Pass Base5_Fus_Izq_4
+                Pass Base5_Fus_Izq_3
+                Pass Base5_Fus_Izq_2
+                Go Base5_Fus_Izq_1
+                On 2
+                Wait 0.2
+                Pass Base5_Fus_Izq_2
+                Pass Base5_Fus_Izq_3
+                Pass Base5_Fus_Izq_4
+            Case 6
+                Pass Base6_Fus_Izq_4
+                Pass Base6_Fus_Izq_3
+                Pass Base6_Fus_Izq_2
+                Go Base6_Fus_Izq_1
+                On 2
+                Wait 0.2
+                Pass Base6_Fus_Izq_2
+                Pass Base6_Fus_Izq_3
+                Pass Base6_Fus_Izq_4
+        Send
+    ElseIf ranura$ = "D" Then
+        Select num_base
+            Case 1
+                Pass Base1_Fus_Der_4
+                Pass Base1_Fus_Der_3
+                Pass Base1_Fus_Der_2
+                Go Base1_Fus_Der_1
+                On 2
+                Wait 0.2
+                Pass Base1_Fus_Der_2
+                Pass Base1_Fus_Der_3
+                Pass Base1_Fus_Der_4
+            Case 2
+                Pass Base2_Fus_Der_4
+                Pass Base2_Fus_Der_3
+                Pass Base2_Fus_Der_2
+                Go Base2_Fus_Der_1
+                On 2
+                Wait 0.2
+                Pass Base2_Fus_Der_2
+                Pass Base2_Fus_Der_3
+                Pass Base2_Fus_Der_4
+            Case 3
+                Pass Base3_Fus_Der_4
+                Pass Base3_Fus_Der_3
+                Pass Base3_Fus_Der_2
+                Go Base3_Fus_Der_1
+                On 2
+                Wait 0.2
+                Pass Base3_Fus_Der_2
+                Pass Base3_Fus_Der_3
+                Pass Base3_Fus_Der_4
+            Case 4
+                Pass Base4_Fus_Der_4
+                Pass Base4_Fus_Der_3
+                Pass Base4_Fus_Der_2
+                Go Base4_Fus_Der_1
+                On 2
+                Wait 0.2
+                Pass Base4_Fus_Der_2
+                Pass Base4_Fus_Der_3
+                Pass Base4_Fus_Der_4
+            Case 5
+                Pass Base5_Fus_Der_4
+                Pass Base5_Fus_Der_3
+                Pass Base5_Fus_Der_2
+                Go Base5_Fus_Der_1
+                On 2
+                Wait 0.2
+                Pass Base5_Fus_Der_2
+                Pass Base5_Fus_Der_3
+                Pass Base5_Fus_Der_4
+            Case 6
+                Pass Base6_Fus_Der_4
+                Pass Base6_Fus_Der_3
+                Pass Base6_Fus_Der_2
+                Go Base6_Fus_Der_1
+                On 2
+                Wait 0.2
+                Pass Base6_Fus_Der_2
+                Pass Base6_Fus_Der_3
+                Pass Base6_Fus_Der_4
+        Send
+    EndIf
+Fend
+</code></pre>
+</section>
+
+<footer>&copy; 2026 The Valeria Garduño Times. Printed in Morelia.</footer>
+</div>
+<script>
+document.querySelectorAll('figure.slot').forEach(function(f){
+  var m=f.querySelector('img,source');
+  if(m)m.addEventListener('error',function(){f.classList.add('missing')});
+  var i=f.querySelector('img');
+  if(i&&i.complete&&i.naturalWidth===0)f.classList.add('missing');
+  var v=f.querySelector('video');
+  if(v&&v.networkState===3)f.classList.add('missing');
+});
+</script>
+</body>
+</html>
